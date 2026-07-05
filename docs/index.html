@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Boedelverdeling</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:0 10px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border:1px solid #ccc;padding:6px 8px;font-size:14px;text-align:left}
+th{background:#1F3864;color:#fff}
+.tab-btn{padding:8px 16px;border:1px solid #1F3864;background:#fff;cursor:pointer}
+.tab-btn.active{background:#1F3864;color:#fff}
+.tab{display:none}.tab.active{display:block}
+#setup{background:#F8CBAD;padding:10px;margin-bottom:10px}
+.ok{color:green}.err{color:#C00000}
+</style>
+</head>
+<body>
+<h2>Boedelverdeling</h2>
+
+<div id="setup">
+  <label>Ik ben: <select id="heirSel"></select></label>
+  <label style="margin-left:10px">GitHub PAT: <input type="password" id="patInput" size="40"></label>
+  <button id="saveSetup">Opslaan</button>
+  <span id="setupStatus"></span>
+</div>
+
+<div>
+  <button class="tab-btn active" data-tab="bied">Biedingen</button>
+  <button class="tab-btn" data-tab="log">Logboek</button>
+  <button id="refreshBtn">Vernieuwen</button>
+  <button id="saveLogBtn">Logboek opslaan</button>
+</div>
+
+<div id="bied" class="tab active">
+  <table id="itemTable">
+    <thead><tr><th>Kavel</th><th>Omschrijving</th><th>Hoogste bod</th><th>Leider</th><th>Uw bod</th><th></th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div id="log" class="tab">
+  <table id="logTable">
+    <thead><tr><th>Tijdstip</th><th>Bieder</th><th>Kavel</th><th>Bod</th><th>Geldig?</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p><a id="historyLink" href="#" target="_blank">Bekijk commit-geschiedenis op GitHub</a></p>
+</div>
+
+<script>
+const OWNER = "JOUW-GITHUB-GEBRUIKERSNAAM"; // eigenaar van boedel-data
+const DATA_REPO = "boedel-data";
+const BRANCH = "main";
+const BID_PATH = "bids.jsonl";
+
+let items=[], heirs=[], settings={increment:25}, cachedBids=[];
+let heir = localStorage.getItem('heir') || '';
+let pat = localStorage.getItem('pat') || '';
+
+async function loadConfig(){
+  items = await (await fetch('items.json')).json();
+  heirs = await (await fetch('heirs.json')).json();
+  settings = await (await fetch('settings.json')).json();
+  const sel = document.getElementById('heirSel');
+  sel.innerHTML = heirs.map(h=>`<option value="${h.name}">${h.name}</option>`).join('');
+  if(heir) sel.value = heir;
+  document.getElementById('patInput').value = pat;
+}
+
+document.getElementById('saveSetup').onclick = ()=>{
+  heir = document.getElementById('heirSel').value;
+  pat = document.getElementById('patInput').value.trim();
+  localStorage.setItem('heir', heir);
+  localStorage.setItem('pat', pat);
+  document.getElementById('setupStatus').textContent = 'Opgeslagen.';
+};
+
+document.querySelectorAll('.tab-btn[data-tab]').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.tab).classList.add('active');
+  };
+});
+
+function b64EncodeUnicode(str){ return btoa(String.fromCharCode(...new TextEncoder().encode(str))); }
+function b64DecodeUnicode(b64){
+  const bin = atob(b64);
+  return new TextDecoder().decode(Uint8Array.from(bin, c=>c.charCodeAt(0)));
+}
+
+async function ghGetBids(){
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${DATA_REPO}/contents/${BID_PATH}?ref=${BRANCH}`,
+    {headers:{Authorization:`token ${pat}`, Accept:'application/vnd.github+json'}});
+  if(!res.ok) throw new Error(`GET mislukt (${res.status}): ${(await res.json()).message||''}`);
+  const data = await res.json();
+  const content = data.content ? b64DecodeUnicode(data.content.replace(/\n/g,'')) : '';
+  return {content, sha: data.sha};
+}
+
+async function ghPutBids(content, sha, message){
+  return fetch(`https://api.github.com/repos/${OWNER}/${DATA_REPO}/contents/${BID_PATH}`,{
+    method:'PUT',
+    headers:{Authorization:`token ${pat}`, Accept:'application/vnd.github+json'},
+    body: JSON.stringify({message, content:b64EncodeUnicode(content), sha, branch:BRANCH})
+  });
+}
+
+function parseBids(content){ return content.split('\n').filter(l=>l.trim()).map(l=>JSON.parse(l)); }
+
+// Geldig als bod >= vorig geldig hoogste + ophoging (of >= ophoging bij openingsbod)
+function computeState(bids){
+  const state = {};
+  const withValidity = bids.map(b=>{
+    const s = state[b.item] || {high:0, leader:null};
+    const required = s.high===0 ? settings.increment : s.high + settings.increment;
+    const valid = b.bid >= required;
+    if(valid) state[b.item] = {high:b.bid, leader:b.heir};
+    return {...b, valid, required};
+  });
+  return {state, withValidity};
+}
+
+async function refresh(){
+  const {content} = await ghGetBids();
+  cachedBids = parseBids(content);
+  const {state, withValidity} = computeState(cachedBids);
+  renderItems(state);
+  renderLog(withValidity);
+  document.getElementById('historyLink').href = `https://github.com/${OWNER}/${DATA_REPO}/commits/${BRANCH}/${BID_PATH}`;
+}
+
+function renderItems(state){
+  document.querySelector('#itemTable tbody').innerHTML = items.map(it=>{
+    const s = state[it.id] || {high:0, leader:''};
+    return `<tr><td>${it.id}</td><td>${it.desc}</td><td>€${s.high}</td><td>${s.leader||''}</td>
+      <td><input type="number" min="0" step="1" id="bid_${it.id}"></td>
+      <td><button onclick="placeBid('${it.id}')">Bieden</button></td></tr>`;
+  }).join('');
+}
+
+function renderLog(rows){
+  document.querySelector('#logTable tbody').innerHTML = rows.slice().reverse().map(r=>
+    `<tr class="${r.valid?'ok':'err'}"><td>${r.ts}</td><td>${r.heir}</td><td>${r.item}</td>
+     <td>€${r.bid}</td><td>${r.valid?'ja':'NEE (vereist €'+r.required+')'}</td></tr>`).join('');
+}
+
+async function placeBid(itemId){
+  if(!heir || !pat){ alert('Vul naam en PAT in en klik Opslaan.'); return; }
+  const el = document.getElementById(`bid_${itemId}`);
+  const amount = Number(el.value);
+  if(!amount || amount<=0){ alert('Vul een geldig bedrag in.'); return; }
+
+  for(let attempt=0; attempt<5; attempt++){
+    const {content, sha} = await ghGetBids();
+    const {state} = computeState(parseBids(content));
+    const s = state[itemId] || {high:0};
+    const required = s.high===0 ? settings.increment : s.high + settings.increment;
+    if(amount < required){ alert(`Bod te laag. Vereist minimaal €${required}.`); return; }
+    if(!confirm(`Bevestig bod van €${amount} op ${itemId} namens ${heir}?`)) return;
+
+    const line = JSON.stringify({ts:new Date().toISOString(), heir, item:itemId, bid:amount});
+    const newContent = content + (content && !content.endsWith('\n') ? '\n' : '') + line + '\n';
+    const res = await ghPutBids(newContent, sha, `bid: ${heir} ${itemId} €${amount}`);
+    if(res.ok){ await refresh(); return; }
+    if(res.status===409 || res.status===422) continue; // iemand anders was sneller
+    alert('Fout: '+(await res.json()).message); return;
+  }
+  alert('Kon bod niet plaatsen (herhaalde conflicten).');
+}
+
+document.getElementById('refreshBtn').onclick = refresh;
+document.getElementById('saveLogBtn').onclick = ()=>{
+  const {state} = computeState(cachedBids);
+  let body = 'Status boedelverdeling:\n\n';
+  items.forEach(it=>{
+    const s = state[it.id] || {high:0, leader:''};
+    body += `${it.id} - ${it.desc}: €${s.high} (${s.leader||'geen bod'})\n`;
+  });
+  body += '\nVolledig logboek (JSONL):\n' + cachedBids.map(b=>JSON.stringify(b)).join('\n');
+  const to = heirs.map(h=>h.email).filter(Boolean).join(',');
+  window.location.href = `mailto:${to}?subject=${encodeURIComponent('Boedel - status logboek')}&body=${encodeURIComponent(body)}`;
+};
+
+loadConfig().then(refresh).catch(e=>alert('Kon config/log niet laden: '+e.message));
+</script>
+</body>
+</html>
