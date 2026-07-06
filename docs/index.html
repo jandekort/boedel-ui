@@ -12,6 +12,8 @@ th{background:#1F3864;color:#fff}
 .tab-btn.active{background:#1F3864;color:#fff}
 .tab{display:none}.tab.active{display:block}
 #setup{background:#F8CBAD;padding:10px;margin-bottom:10px}
+input[type=number]{appearance:textfield;-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .ok{color:green}.err{color:#C00000}
 </style>
 </head>
@@ -20,7 +22,7 @@ th{background:#1F3864;color:#fff}
 
 <div id="setup">
   <label>Ik ben: <select id="heirSel"></select></label>
-  <label style="margin-left:10px">GitHub PAT: <input type="password" id="patInput" size="40"></label>
+  <label style="margin-left:10px">Personal Access Token: <input type="password" id="patInput" size="40"></label>
   <button id="saveSetup">Opslaan</button>
   <span id="setupStatus"></span>
 </div>
@@ -34,7 +36,7 @@ th{background:#1F3864;color:#fff}
 
 <div id="bied" class="tab active">
   <table id="itemTable">
-    <thead><tr><th>Kavel</th><th>Omschrijving</th><th>Hoogste bod</th><th>Leider</th><th>Uw bod</th><th></th></tr></thead>
+    <thead><tr><th>Kavel</th><th>Omschrijving</th><th>Hoogste bod</th><th>Leider</th><th>Jouw bod</th><th></th></tr></thead>
     <tbody></tbody>
   </table>
 </div>
@@ -53,24 +55,25 @@ const DATA_REPO = "boedel-data";
 const BRANCH = "main";
 const BID_PATH = "bids.jsonl";
 
-let items=[], heirs=[], settings={increment:25}, cachedBids=[];
-let heir = localStorage.getItem('heir') || '';
+let items=[], heirs=[], settings={minIncrement:5, minPercent:5}, cachedBids=[];
 let pat = localStorage.getItem('pat') || '';
+localStorage.removeItem('heir'); // naam wordt bewust niet onthouden
+
+// De dropdown is de enige bron van waarheid voor de naam, live uitgelezen bij elk bod
+function currentHeir(){ return document.getElementById('heirSel').value; }
 
 async function loadConfig(){
   items = await (await fetch('items.json')).json();
   heirs = await (await fetch('heirs.json')).json();
-  settings = await (await fetch('settings.json')).json();
+  settings = Object.assign({minIncrement:5, minPercent:5}, await (await fetch('settings.json')).json());
   const sel = document.getElementById('heirSel');
-  sel.innerHTML = heirs.map(h=>`<option value="${h.name}">${h.name}</option>`).join('');
-  if(heir) sel.value = heir;
+  sel.innerHTML = '<option value="" disabled selected>Kies een naam</option>'
+    + heirs.map(h=>`<option value="${h.name}">${h.name}</option>`).join('');
   document.getElementById('patInput').value = pat;
 }
 
 document.getElementById('saveSetup').onclick = ()=>{
-  heir = document.getElementById('heirSel').value;
   pat = document.getElementById('patInput').value.trim();
-  localStorage.setItem('heir', heir);
   localStorage.setItem('pat', pat);
   document.getElementById('setupStatus').textContent = 'Opgeslagen.';
 };
@@ -109,12 +112,18 @@ async function ghPutBids(content, sha, message){
 
 function parseBids(content){ return content.split('\n').filter(l=>l.trim()).map(l=>JSON.parse(l)); }
 
-// Geldig als bod >= vorig geldig hoogste + ophoging (of >= ophoging bij openingsbod)
+// Minimale ophoging: max(vast bedrag, percentage van huidig hoogste bod), naar boven afgerond op hele euro's
+function requiredBid(high){
+  if(high===0) return settings.minIncrement;
+  return high + Math.max(settings.minIncrement, Math.ceil(high * settings.minPercent / 100));
+}
+
+// Geldig als bod >= vorig geldig hoogste + minimale ophoging (of >= minIncrement bij openingsbod)
 function computeState(bids){
   const state = {};
   const withValidity = bids.map(b=>{
     const s = state[b.item] || {high:0, leader:null};
-    const required = s.high===0 ? settings.increment : s.high + settings.increment;
+    const required = requiredBid(s.high);
     const valid = b.bid >= required;
     if(valid) state[b.item] = {high:b.bid, leader:b.heir};
     return {...b, valid, required};
@@ -135,7 +144,7 @@ function renderItems(state){
   document.querySelector('#itemTable tbody').innerHTML = items.map(it=>{
     const s = state[it.id] || {high:0, leader:''};
     return `<tr><td>${it.id}</td><td>${it.desc}</td><td>€${s.high}</td><td>${s.leader||''}</td>
-      <td><input type="number" min="0" step="1" id="bid_${it.id}"></td>
+      <td><input type="number" min="0" step="1" id="bid_${it.id}" placeholder="min €${requiredBid(s.high)}"></td>
       <td><button onclick="placeBid('${it.id}')">Bieden</button></td></tr>`;
   }).join('');
 }
@@ -147,7 +156,9 @@ function renderLog(rows){
 }
 
 async function placeBid(itemId){
-  if(!heir || !pat){ alert('Vul naam en PAT in en klik Opslaan.'); return; }
+  const heir = currentHeir();
+  if(!heir){ alert('Kies eerst een naam in de lijst "Ik ben".'); return; }
+  if(!pat){ alert('Vul een Personal Access Token in en klik Opslaan.'); return; }
   const el = document.getElementById(`bid_${itemId}`);
   const amount = Number(el.value);
   if(!amount || amount<=0){ alert('Vul een geldig bedrag in.'); return; }
@@ -156,7 +167,7 @@ async function placeBid(itemId){
     const {content, sha} = await ghGetBids();
     const {state} = computeState(parseBids(content));
     const s = state[itemId] || {high:0};
-    const required = s.high===0 ? settings.increment : s.high + settings.increment;
+    const required = requiredBid(s.high);
     if(amount < required){ alert(`Bod te laag. Vereist minimaal €${required}.`); return; }
     if(!confirm(`Bevestig bod van €${amount} op ${itemId} namens ${heir}?`)) return;
 
@@ -172,15 +183,16 @@ async function placeBid(itemId){
 
 document.getElementById('refreshBtn').onclick = refresh;
 document.getElementById('saveLogBtn').onclick = ()=>{
-  const {state} = computeState(cachedBids);
-  let body = 'Status boedelverdeling:\n\n';
-  items.forEach(it=>{
-    const s = state[it.id] || {high:0, leader:''};
-    body += `${it.id} - ${it.desc}: €${s.high} (${s.leader||'geen bod'})\n`;
-  });
-  body += '\nVolledig logboek (JSONL):\n' + cachedBids.map(b=>JSON.stringify(b)).join('\n');
-  const to = heirs.map(h=>h.email).filter(Boolean).join(',');
-  window.location.href = `mailto:${to}?subject=${encodeURIComponent('Boedel - status logboek')}&body=${encodeURIComponent(body)}`;
+  const content = cachedBids.map(b=>JSON.stringify(b)).join('\n') + (cachedBids.length ? '\n' : '');
+  const blob = new Blob([content], {type:'application/x-jsonlines'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bids-${new Date().toISOString().slice(0,10)}.jsonl`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 };
 
 loadConfig().then(refresh).catch(e=>alert('Kon config/log niet laden: '+e.message));

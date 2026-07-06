@@ -22,8 +22,8 @@ Rationale: GitHub Pages Free serves only from public repos, and even Pro-tier pr
 - Data layer: GitHub Contents API (`GET`/`PUT` on `boedel-data:bids.jsonl`), used as an append-only ledger.
 - Auth: GitHub PATs, entered by each user in the browser, stored in `localStorage`. No server-side secret handling.
 - Concurrency control: optimistic locking via the Contents API's `sha` parameter (see `ghGetBids`/`ghPutBids`/`placeBid` in `index.html`).
-- Identity: self-declared name (dropdown from `heirs.json`) plus whichever PAT's owner actually authors the commit. Not cryptographically bound; the git commit author is the real audit signal, the dropdown name is a convenience label matched against it in `Biedingen`.
-- Email export: `mailto:` link generated client-side in `Logboek opslaan`. No email API, no backend.
+- Identity: self-declared name (dropdown from `heirs.json`; read live from the dropdown at bid time, deliberately never persisted, so every page load starts on the placeholder "Kies een naam" and nobody accidentally bids under someone else's name) plus whichever PAT's owner actually authors the commit. Not cryptographically bound; the git commit author is the real audit signal, the dropdown name is a convenience label matched against it in `Biedingen`.
+- Log export: `Logboek opslaan` downloads the raw `bids.jsonl` as a local file (e.g. to Downloads), generated client-side via a Blob. No email API, no backend.
 
 ## Files in this repo
 
@@ -31,7 +31,7 @@ Rationale: GitHub Pages Free serves only from public repos, and even Pro-tier pr
 index.html      - app: two tabs (Biedingen, Logboek), bid form, GitHub API calls
 items.json      - list of estate items (id, desc)
 heirs.json      - list of heirs (name, email)
-settings.json   - { "increment": <minimum bid increment in EUR> }
+settings.json   - { "minIncrement": <EUR>, "minPercent": <%> } (defaults 5 / 5)
 ```
 
 ## Data model (in `boedel-data:bids.jsonl`)
@@ -42,7 +42,7 @@ One JSON object per line, append-only:
 {"ts":"2026-07-05T14:32:10Z","heir":"Claar","item":"A02","bid":475}
 ```
 
-Validity rule (computed client-side on every load, never trusted from cache): a bid is valid iff `bid >= (current valid high for that item) + increment`, or `bid >= increment` if no valid prior bid exists for that item. Invalid bids remain in the log (append-only, never deleted) but do not affect the displayed leader/high bid.
+Validity rule (computed client-side on every load, never trusted from cache): the minimum raise is `max(minIncrement, ceil(minPercent% of current valid high))`, so a bid is valid iff `bid >= high + max(minIncrement, ceil(high * minPercent / 100))`, or `bid >= minIncrement` if no valid prior bid exists for that item. Both knobs are independently configurable in `settings.json` (defaults: `minIncrement` €5, `minPercent` 5%). Invalid bids remain in the log (append-only, never deleted) but do not affect the displayed leader/high bid. The current minimum for each item is shown as a placeholder in its bid field.
 
 ## Setup
 
@@ -64,13 +64,13 @@ Validity rule (computed client-side on every load, never trusted from cache): a 
 1. Open `https://<username>.github.io/boedel-ui/` in two separate browser profiles or incognito windows.
 2. Window 1: select an heir name, paste the owner's fine-grained PAT, click Opslaan. Window 2: select a different heir, paste a collaborator's classic PAT, click Opslaan.
 3. Place a bid from each window, refresh, confirm leader and high bid match in both.
-4. Submit a bid below `high + increment`. Confirm it appears in Logboek marked as invalid (`NEE`) and does not change the leader.
+4. Submit a bid below the required minimum (shown as placeholder in the bid field). Confirm it appears in Logboek marked as invalid (`NEE`) and does not change the leader.
 5. Check `https://github.com/<owner>/boedel-data/commits/main/bids.jsonl`, confirm two distinct commit authors (one per PAT owner). If both commits show the same author, identity is not actually bound per-person and the audit-trail advantage over a shared spreadsheet is lost; recheck step 6 of Setup.
-6. Click `Logboek opslaan`, confirm a `mailto:` draft opens with a per-item summary followed by the full raw JSONL log.
+6. Click `Logboek opslaan`, confirm a `bids-<date>.jsonl` file downloads containing the full raw JSONL log.
 
 ## Known limitations (by design, for MVP scope)
 
 - GitHub's CDN caches Contents API reads; a just-committed bid can take up to roughly a minute to appear even after a manual refresh. No push mechanism exists on static hosting; this is inherent to the architecture, not a bug to fix without adding a backend.
 - No server-side enforcement of the append-only rule or the minimum-increment rule. Both are checked client-side and by convention. A user with write access to `boedel-data` could in principle edit history directly on github.com. Mitigation: this is tamper-evident (visible in commit history), not tamper-proof.
 - Identity is only as strong as PAT custody. Anyone holding another person's PAT can commit under that person's authorization scope, though the commit author will still be tied to whichever account's PAT was used.
-- `mailto:` has body-length limits in some clients; very long logs may truncate. No current fallback other than manual copy-paste.
+- `Logboek opslaan` exports the log as last loaded in the browser (click Vernieuwen first for the freshest state); the canonical record remains `boedel-data:bids.jsonl` itself.
