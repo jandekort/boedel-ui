@@ -68,7 +68,7 @@ Validity rule (computed client-side on every load, never trusted from cache): th
 
 ## Known limitations (by design, for MVP scope)
 
-- GitHub's CDN caches Contents API reads; a just-committed bid can take up to roughly a minute to appear even after a manual refresh. No push mechanism exists on static hosting; this is inherent to the architecture, not a bug to fix without adding a backend.
+- GitHub caches Contents API reads for up to ~60s. Mitigated two ways: reads use `cache:'no-store'` (bypasses the browser's own HTTP cache), and the app remembers its own last successful write (`lastKnown`) — since the log is append-only, a stale read is recognizable as a strict prefix of it and is then ignored. Your own bids therefore show up immediately and never conflict with themselves; someone else's just-committed bid can still take up to a minute to appear. No push mechanism exists on static hosting; this is inherent to the architecture.
 - No server-side enforcement of the append-only rule or the minimum-increment rule. Both are checked client-side and by convention. A user with write access to `boedel-data` could in principle edit history directly on github.com. Mitigation: this is tamper-evident (visible in commit history), not tamper-proof.
 - Identity is entirely self-declared: the shared token means anyone holding it can bid under any name. Commit history proves when bids were appended, not who placed them. Acceptable within a trusting family; the token's only security job is keeping outsiders from reading or writing the data.
 - `Logboek opslaan` exports the log as last loaded in the browser (click Vernieuwen first for the freshest state); the canonical record remains `boedel-data:bids.jsonl` itself.

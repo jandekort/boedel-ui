@@ -51,6 +51,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   <p><a id="historyLink" href="#" target="_blank">Bekijk commit-geschiedenis op GitHub</a></p>
 </div>
 
+<p id="rules" style="color:#555;font-size:13px"></p>
+
 <script>
 const OWNER = "jandekort"; // eigenaar van boedel-data
 const DATA_REPO = "boedel-data";
@@ -68,6 +70,8 @@ async function loadConfig(){
   items = await (await fetch('items.json')).json();
   heirs = await (await fetch('heirs.json')).json();
   settings = Object.assign({minIncrement:5, minPercent:5}, await (await fetch('settings.json')).json());
+  document.getElementById('rules').textContent =
+    `Minimale ophoging: €${settings.minIncrement} of ${settings.minPercent}% van het hoogste bod (de hoogste van de twee geldt). Openingsbod: minimaal €${settings.minIncrement}.`;
   const sel = document.getElementById('heirSel');
   sel.innerHTML = '<option value="" disabled selected>Kies een naam</option>'
     + heirs.map(h=>`<option value="${h.name}">${h.name}</option>`).join('');
@@ -108,12 +112,21 @@ function b64DecodeUnicode(b64){
   return new TextDecoder().decode(Uint8Array.from(bin, c=>c.charCodeAt(0)));
 }
 
+// Meest recente bewezen versie (uit een GET of uit onze eigen geslaagde PUT).
+// Omdat het log append-only is, is een oudere versie altijd een prefix van een nieuwere;
+// zo herkennen we een verouderd (gecachet) GET-antwoord en gebruiken we onze eigen versie.
+let lastKnown = null;
+
 async function ghGetBids(){
   const res = await fetch(`https://api.github.com/repos/${OWNER}/${DATA_REPO}/contents/${BID_PATH}?ref=${BRANCH}`,
-    {headers:{Authorization:`token ${pat}`, Accept:'application/vnd.github+json'}});
+    {cache:'no-store', headers:{Authorization:`token ${pat}`, Accept:'application/vnd.github+json'}});
   if(!res.ok) throw new Error(`GET mislukt (${res.status}): ${(await res.json()).message||''}`);
   const data = await res.json();
   const content = data.content ? b64DecodeUnicode(data.content.replace(/\n/g,'')) : '';
+  if(lastKnown && lastKnown.content.length > content.length && lastKnown.content.startsWith(content)){
+    return {...lastKnown};
+  }
+  lastKnown = {content, sha: data.sha};
   return {content, sha: data.sha};
 }
 
@@ -195,7 +208,11 @@ async function placeBid(itemId){
     const line = JSON.stringify({ts:new Date().toISOString(), heir, item:itemId, bid:amount});
     const newContent = content + (content && !content.endsWith('\n') ? '\n' : '') + line + '\n';
     const res = await ghPutBids(newContent, sha, `bid: ${heir} ${itemId} €${amount}`);
-    if(res.ok){ await refresh(); return; }
+    if(res.ok){
+      const data = await res.json();
+      lastKnown = {content: newContent, sha: data.content.sha};
+      await refresh(); return;
+    }
     if(res.status===409 || res.status===422) continue; // iemand anders was sneller
     alert('Fout: '+(await res.json()).message); return;
   }
