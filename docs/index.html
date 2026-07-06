@@ -59,7 +59,8 @@ const DATA_REPO = "boedel-data";
 const BRANCH = "main";
 const BID_PATH = "bids.jsonl";
 
-let items=[], heirs=[], settings={minIncrement:5, minPercent:5}, cachedBids=[];
+const SETTINGS_DEFAULTS = {minRaiseEur:5, minRaisePct:5, minOpeningBidEur:1};
+let items=[], heirs=[], settings={...SETTINGS_DEFAULTS}, cachedBids=[];
 let pat = localStorage.getItem('pat') || '';
 localStorage.removeItem('heir'); // naam wordt bewust niet onthouden
 
@@ -69,9 +70,9 @@ function currentHeir(){ return document.getElementById('heirSel').value; }
 async function loadConfig(){
   items = await (await fetch('items.json')).json();
   heirs = await (await fetch('heirs.json')).json();
-  settings = Object.assign({minIncrement:5, minPercent:5}, await (await fetch('settings.json')).json());
+  settings = Object.assign({...SETTINGS_DEFAULTS}, await (await fetch('settings.json')).json());
   document.getElementById('rules').textContent =
-    `Minimale ophoging: €${settings.minIncrement} of ${settings.minPercent}% van het hoogste bod (de hoogste van de twee geldt). Openingsbod: minimaal €${settings.minIncrement}.`;
+    `Openingsbod: minimaal €${settings.minOpeningBidEur}. Minimale ophoging: €${settings.minRaiseEur} of ${settings.minRaisePct}% van het hoogste bod (de hoogste van de twee geldt).`;
   const sel = document.getElementById('heirSel');
   sel.innerHTML = '<option value="" disabled selected>Kies een naam</option>'
     + heirs.map(h=>`<option value="${h.name}">${h.name}</option>`).join('');
@@ -142,11 +143,11 @@ function parseBids(content){ return content.split('\n').filter(l=>l.trim()).map(
 
 // Minimale ophoging: max(vast bedrag, percentage van huidig hoogste bod), naar boven afgerond op hele euro's
 function requiredBid(high){
-  if(high===0) return settings.minIncrement;
-  return high + Math.max(settings.minIncrement, Math.ceil(high * settings.minPercent / 100));
+  if(high===0) return settings.minOpeningBidEur;
+  return high + Math.max(settings.minRaiseEur, Math.ceil(high * settings.minRaisePct / 100));
 }
 
-// Geldig als bod >= vorig geldig hoogste + minimale ophoging (of >= minIncrement bij openingsbod)
+// Geldig als bod >= vorig geldig hoogste + minimale ophoging (of >= minOpeningBidEur bij openingsbod)
 function computeState(bids){
   const state = {};
   const withValidity = bids.map(b=>{

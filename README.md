@@ -31,7 +31,7 @@ Rationale: GitHub Pages Free serves only from public repos, and even Pro-tier pr
 index.html      - app: two tabs (Biedingen, Logboek), bid form, GitHub API calls
 items.json      - list of estate items (id, desc)
 heirs.json      - list of heirs (name, email)
-settings.json   - { "minIncrement": <EUR>, "minPercent": <%> } (defaults 5 / 5)
+settings.json   - { "minRaiseEur": <EUR>, "minRaisePct": <%>, "minOpeningBidEur": <EUR> } (defaults 5 / 5 / 1)
 ```
 
 ## Data model (in `boedel-data:bids.jsonl`)
@@ -42,7 +42,7 @@ One JSON object per line, append-only:
 {"ts":"2026-07-05T14:32:10Z","heir":"Claar","item":"A02","bid":475}
 ```
 
-Validity rule (computed client-side on every load, never trusted from cache): the minimum raise is `max(minIncrement, ceil(minPercent% of current valid high))`, so a bid is valid iff `bid >= high + max(minIncrement, ceil(high * minPercent / 100))`, or `bid >= minIncrement` if no valid prior bid exists for that item. Both knobs are independently configurable in `settings.json` (defaults: `minIncrement` €5, `minPercent` 5%). Invalid bids remain in the log (append-only, never deleted) but do not affect the displayed leader/high bid. The current minimum for each item is shown as a placeholder in its bid field.
+Validity rule (computed client-side on every load, never trusted from cache): a bid is valid iff `bid >= high + max(minRaiseEur, ceil(high * minRaisePct / 100))`, or `bid >= minOpeningBidEur` if no valid prior bid exists for that item. All three knobs are independently configurable in `settings.json` (defaults: €5 / 5% / €1). Invalid bids remain in the log (append-only, never deleted) but do not affect the displayed leader/high bid. The current minimum for each item is shown as a placeholder in its bid field, and the active rules are shown below the tables.
 
 ## Setup
 
