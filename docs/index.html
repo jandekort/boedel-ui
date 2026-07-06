@@ -12,6 +12,8 @@ th{background:#1F3864;color:#fff}
 .tab-btn.active{background:#1F3864;color:#fff}
 .tab{display:none}.tab.active{display:block}
 #setup{background:#F8CBAD;padding:10px;margin-bottom:10px}
+#heirSel.noname{border:2px solid #C00000}
+#itemTable button:disabled{opacity:.4;cursor:not-allowed}
 input[type=number]{appearance:textfield;-moz-appearance:textfield}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .ok{color:green}.err{color:#C00000}
@@ -69,7 +71,20 @@ async function loadConfig(){
   const sel = document.getElementById('heirSel');
   sel.innerHTML = '<option value="" disabled selected>Kies een naam</option>'
     + heirs.map(h=>`<option value="${h.name}">${h.name}</option>`).join('');
+  sel.classList.add('noname');
+  sel.onchange = updateBidButtons;
   document.getElementById('patInput').value = pat;
+  if(pat) document.getElementById('setupStatus').innerHTML = '<span class="ok">Token aanwezig.</span>';
+}
+
+// Bieden kan pas als er een naam gekozen is; de rode rand verdwijnt zodra dat gebeurd is
+function updateBidButtons(){
+  const ok = !!currentHeir();
+  document.getElementById('heirSel').classList.toggle('noname', !ok);
+  document.querySelectorAll('#itemTable tbody button').forEach(b=>{
+    b.disabled = !ok;
+    b.title = ok ? '' : 'Kies eerst een naam';
+  });
 }
 
 document.getElementById('saveSetup').onclick = ()=>{
@@ -147,6 +162,7 @@ function renderItems(state){
       <td><input type="number" min="0" step="1" id="bid_${it.id}" placeholder="min €${requiredBid(s.high)}"></td>
       <td><button onclick="placeBid('${it.id}')">Bieden</button></td></tr>`;
   }).join('');
+  updateBidButtons();
 }
 
 function renderLog(rows){
@@ -163,13 +179,18 @@ async function placeBid(itemId){
   const amount = Number(el.value);
   if(!amount || amount<=0){ alert('Vul een geldig bedrag in.'); return; }
 
+  // Bevestiging door de naam te typen (hoofdletters en spaties maken niet uit)
+  const norm = s => s.toLowerCase().replace(/\s+/g,'');
+  const typed = prompt(`Wil je een bod van €${amount} uitbrengen op ${itemId} voor ${heir}?\n\nTyp "${heir}" om het bod te bevestigen:`);
+  if(typed === null) return;
+  if(norm(typed) !== norm(heir)){ alert('Naam komt niet overeen. Bod niet geplaatst.'); return; }
+
   for(let attempt=0; attempt<5; attempt++){
     const {content, sha} = await ghGetBids();
     const {state} = computeState(parseBids(content));
     const s = state[itemId] || {high:0};
     const required = requiredBid(s.high);
     if(amount < required){ alert(`Bod te laag. Vereist minimaal €${required}.`); return; }
-    if(!confirm(`Bevestig bod van €${amount} op ${itemId} namens ${heir}?`)) return;
 
     const line = JSON.stringify({ts:new Date().toISOString(), heir, item:itemId, bid:amount});
     const newContent = content + (content && !content.endsWith('\n') ? '\n' : '') + line + '\n';
