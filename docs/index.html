@@ -24,7 +24,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
 <div id="setup">
   <label>Ik ben: <select id="heirSel"></select></label>
-  <label style="margin-left:10px">Personal Access Token: <input type="password" id="patInput" size="40"></label>
+  <label style="margin-left:10px">Toegangstoken: <input type="password" id="patInput" size="40"></label>
   <button id="saveSetup">Opslaan</button>
   <span id="setupStatus"></span>
 </div>
@@ -188,7 +188,7 @@ function renderLog(rows){
 async function placeBid(itemId){
   const heir = currentHeir();
   if(!heir){ alert('Kies eerst een naam in de lijst "Ik ben".'); return; }
-  if(!pat){ alert('Vul een Personal Access Token in en klik Opslaan.'); return; }
+  if(!pat){ alert('Vul een Toegangstoken in en klik Opslaan.'); return; }
   const el = document.getElementById(`bid_${itemId}`);
   const amount = Number(el.value);
   if(!amount || amount<=0){ alert('Vul een geldig bedrag in.'); return; }
@@ -222,7 +222,10 @@ async function placeBid(itemId){
 
 document.getElementById('refreshBtn').onclick = refresh;
 document.getElementById('saveLogBtn').onclick = ()=>{
-  const content = cachedBids.map(b=>JSON.stringify(b)).join('\n') + (cachedBids.length ? '\n' : '');
+  // lastKnown is minstens zo vers als cachedBids: het wordt al bijgewerkt zodra een eigen PUT slaagt,
+  // ook als de refresh daarna mislukt
+  const content = lastKnown ? lastKnown.content
+    : cachedBids.map(b=>JSON.stringify(b)).join('\n') + (cachedBids.length ? '\n' : '');
   const blob = new Blob([content], {type:'application/x-jsonlines'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
