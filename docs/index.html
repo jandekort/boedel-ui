@@ -79,7 +79,10 @@ async function loadConfig(){
   sel.classList.add('noname');
   sel.onchange = updateBidButtons;
   document.getElementById('patInput').value = pat;
-  if(pat) document.getElementById('setupStatus').innerHTML = '<span class="ok">Token aanwezig.</span>';
+}
+
+function setStatus(msg, ok){
+  document.getElementById('setupStatus').innerHTML = msg ? `<span class="${ok?'ok':'err'}">${msg}</span>` : '';
 }
 
 // Bieden kan pas als er een naam gekozen is; de rode rand verdwijnt zodra dat gebeurd is
@@ -95,7 +98,8 @@ function updateBidButtons(){
 document.getElementById('saveSetup').onclick = ()=>{
   pat = document.getElementById('patInput').value.trim();
   localStorage.setItem('pat', pat);
-  document.getElementById('setupStatus').textContent = 'Opgeslagen.';
+  if(pat) tryRefresh();
+  else setStatus('Vul een Toegangstoken in en klik Opslaan om de biedingen te laden.', false);
 };
 
 document.querySelectorAll('.tab-btn[data-tab]').forEach(b=>{
@@ -121,7 +125,11 @@ let lastKnown = null;
 async function ghGetBids(){
   const res = await fetch(`https://api.github.com/repos/${OWNER}/${DATA_REPO}/contents/${BID_PATH}?ref=${BRANCH}`,
     {cache:'no-store', headers:{Authorization:`token ${pat}`, Accept:'application/vnd.github+json'}});
-  if(!res.ok) throw new Error(`GET mislukt (${res.status}): ${(await res.json()).message||''}`);
+  if(!res.ok){
+    const err = new Error(`GET mislukt (${res.status}): ${(await res.json()).message||''}`);
+    err.status = res.status;
+    throw err;
+  }
   const data = await res.json();
   const content = data.content ? b64DecodeUnicode(data.content.replace(/\n/g,'')) : '';
   if(lastKnown && lastKnown.content.length > content.length && lastKnown.content.startsWith(content)){
@@ -158,6 +166,20 @@ function computeState(bids){
     return {...b, valid, required};
   });
   return {state, withValidity};
+}
+
+// Haalt de biedingen op en vertaalt fouten naar een melding naast het token-veld
+async function tryRefresh(){
+  if(!pat){ setStatus('Vul een Toegangstoken in en klik Opslaan om de biedingen te laden.', false); return; }
+  setStatus('Laden…', true);
+  try{
+    await refresh();
+    setStatus('Biedingen geladen.', true);
+  }catch(e){
+    if(e.status===401) setStatus('Toegangstoken ongeldig of verlopen. Controleer het token en klik Opslaan.', false);
+    else if(e.status===404) setStatus('Logbestand niet gevonden. Heeft dit token toegang tot de juiste repository?', false);
+    else setStatus('Laden mislukt: '+e.message, false);
+  }
 }
 
 async function refresh(){
@@ -212,7 +234,7 @@ async function placeBid(itemId){
     if(res.ok){
       const data = await res.json();
       lastKnown = {content: newContent, sha: data.content.sha};
-      await refresh(); return;
+      await tryRefresh(); return;
     }
     if(res.status===409 || res.status===422) continue; // iemand anders was sneller
     alert('Fout: '+(await res.json()).message); return;
@@ -220,7 +242,7 @@ async function placeBid(itemId){
   alert('Kon bod niet plaatsen (herhaalde conflicten).');
 }
 
-document.getElementById('refreshBtn').onclick = refresh;
+document.getElementById('refreshBtn').onclick = tryRefresh;
 document.getElementById('saveLogBtn').onclick = ()=>{
   // lastKnown is minstens zo vers als cachedBids: het wordt al bijgewerkt zodra een eigen PUT slaagt,
   // ook als de refresh daarna mislukt
@@ -237,7 +259,8 @@ document.getElementById('saveLogBtn').onclick = ()=>{
   URL.revokeObjectURL(url);
 };
 
-loadConfig().then(refresh).catch(e=>alert('Kon config/log niet laden: '+e.message));
+// tryRefresh vangt zijn eigen fouten af; de catch hier gaat alleen over de config-bestanden
+loadConfig().then(tryRefresh).catch(e=>alert('Kon configuratie niet laden: '+e.message));
 </script>
 </body>
 </html>
