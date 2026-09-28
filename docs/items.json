@@ -1,11 +1,11 @@
 [
  {
   "id": "A01",
-  "desc": "Tegeltableau Purmerent. Taxatie F. Welkenhuysen: hamerprijs € 1.500–2.000."
+  "desc": "Tegeltableau Purmerent. Taxatie F. Welkenhuysen: hamerprijs EUR 1.500-2.000."
  },
  {
   "id": "A02",
-  "desc": "Schilderij 'Mesdag' scheepje (naar Mesdag). Taxatie F. Welkenhuysen: € 400."
+  "desc": "Schilderij 'Mesdag' scheepje (naar Mesdag). Taxatie F. Welkenhuysen: EUR 400."
  },
  {
   "id": "A03",
@@ -13,16 +13,28 @@
  },
  {
   "id": "A04",
-  "desc": "Aquarel heidelandschap (Albert Grosfeld)."
- },
- {
-  "id": "A05",
-  "desc": "Portret vrouw."
+  "desc": "Aquarel heidelandschap, Albert Grosfeld."
  },
  {
   "id": "A06",
-  "desc": "Koperen etsplaat."
+  "desc": "Geëtste koperplaat met twee ovale Hollandse rivierlandschappen."
  },
+{
+    "id": "A07",
+    "desc": "Rives de la Meuse – Maestricht, Édouard Hostein, lithografie"
+  },
+  {
+    "id": "A08",
+    "desc": "Achterbos, Dirk Baksteen, grafisch werk"
+  },
+  {
+    "id": "A09",
+    "desc": "Landschap met klaprozen en elektriciteitspaal, aquarel/gemengde techniek, toegeschreven aan Mat(hias) Camps; achterzijde gedateerd “26 juli ’53”"
+  },
+  {
+    "id": "A10",
+    "desc": "Portret van vrouw, fotografisch/ingekleurd portret in ovale lijst van Kunsthandel Gebr. Koch"
+  },
  {
   "id": "K01",
   "desc": "Hangklok Vierlingsbeek (glas deurtje gesneuveld)."
@@ -37,7 +49,7 @@
  },
  {
   "id": "H01",
-  "desc": "Omega zakhorloge, modern. Nummer 1 (H6). Taxatie Rikkoert € 50 (chroom)."
+  "desc": "Omega zakhorloge, modern. Nummer 1 (H6). Taxatie Rikkoert EUR 50 (chroom)."
  },
  {
   "id": "H02",
@@ -45,7 +57,7 @@
  },
  {
   "id": "H03",
-  "desc": "Seiko quartz, dames polshorloge. Nummer 3. Niet getaxeerd door Rikkoert."
+  "desc": "Seiko quartz, dames polshorloge. Nummer 3. met datumaanduiding 6-5-82 Niet getaxeerd door Rikkoert."
  },
  {
   "id": "H04",
@@ -57,35 +69,35 @@
  },
  {
   "id": "H06",
-  "desc": "Certina Kurth Freres, zakhorloge double. Nummer 6 (H5). Taxatie Rikkoert € 40 (doublé). Aankoopprijs 395 gulden (bon Heumen, 15-4-91?)."
+  "desc": "Certina Kurth Freres, zakhorloge goud. Nummer 6 (H5). Taxatie Rikkoert EUR 400. Aankoopprijs 395 gulden (bon Heumen, 15-4-91?)."
  },
  {
   "id": "H07",
-  "desc": "Cylinder zakhorloge, savonnete 19e eeuws- goud? Nummer 7 (H4). Taxatie Rikkoert € 225 (goud)."
+  "desc": "Cylindre huit trous en rubis zakhorloge, savonnete 19e eeuws- goud? Nummer 7 (H4). Taxatie Rikkoert EUR 225 (goud)." 
  },
  {
   "id": "H08",
-  "desc": "Antoine Freres, zakhorloge, goud begin 20ste eeuw. Nummer 8 (H1). Taxatie Rikkoert € 400 (goud)."
+  "desc": "Antoine Freres, zakhorloge, double begin 20ste eeuw. Nummer 8 (H1). Taxatie Rikkoert EUR 40 (goud)."
  },
  {
   "id": "H09",
-  "desc": "Gre. Roskopf, zakhorloge begin 20ste eeuw. Nummer 9. Niet getaxeerd door Rikkoert."
+  "desc": "Gre. Roskopf, zakhorloge begin 20ste eeuw. met stoomlocomotief op de wijzerplaat en gegraveerde stoomlocomotief op de achterzijde van de kast. Nummer 9. Niet getaxeerd door Rikkoert."
  },
  {
   "id": "H10",
-  "desc": "JG Graves, Sheffield, sterling zilver, begin 20ste eeuw. Nummer 10 (H8). Taxatie Rikkoert € 50 (zilver)."
+  "desc": "JG Graves, Sheffield, sterling zilver, begin 20ste eeuw. Nummer 10 (H8). Taxatie Rikkoert EUR 50 (zilver)."
  },
  {
   "id": "H11",
-  "desc": "Improved patent, english lever. Nummer 11 (H7). Taxatie Rikkoert € 50 (zilver). Aankoopprijs 475 gulden (bon Bodens, 2-3-93)."
+  "desc": "Improved patent, english lever. Nummer 11 (H7). Taxatie Rikkoert EUR 50 (zilver). Aankoopprijs 475 gulden (bon Bodens, 2-3-93)."
  },
  {
   "id": "H12",
-  "desc": "H Samuel Manchester, the accurate. Nummer 12 (H10). Taxatie Rikkoert € 50."
+  "desc": "H Samuel Manchester, the accurate. Nummer 12 (H10). Taxatie Rikkoert EUR 50."
  },
  {
   "id": "H13",
-  "desc": "Opengewerkt zakhorloge, swiss made, goud? Nummer 13 (H2). Taxatie Rikkoert € 75 (doublé)."
+  "desc": "Opengewerkt zakhorloge, swiss made, double Nummer 13 (H2). Taxatie Rikkoert EUR 75 (doublé)."
  },
  {
   "id": "H14",
@@ -97,15 +109,15 @@
  },
  {
   "id": "H16",
-  "desc": "Carven, Paris polshorloge. Nummer 16. Niet getaxeerd door Rikkoert."
+  "desc": "Carven, Paris polshorloge met inscriptie: 31-8-92, 14.30 h Nummer 16. Niet getaxeerd door Rikkoert."
  },
  {
   "id": "H17",
-  "desc": "A.W.W.Co Waltham Mass. Zakhorloge, zilver. Nummer 17 (H9). Taxatie Rikkoert € 50."
+  "desc": "A.W.W.Co Waltham Mass. Zakhorloge, zilver. Nummer 17 (H9). Taxatie Rikkoert EUR 50."
  },
  {
   "id": "H18",
-  "desc": "Alliance horlogere, cylinder dames zak (of ketting) horloge, zilver. Nummer 18 (H12). Taxatie Rikkoert € 25."
+  "desc": "Alliance horlogere, cylinder dames zak (of ketting) horloge, zilver. Nummer 18 (H12). Taxatie Rikkoert EUR 25."
  },
  {
   "id": "H19",
@@ -113,7 +125,7 @@
  },
  {
   "id": "H20",
-  "desc": "Vladislav Zapletal, 1904, zakhorloge. Nummer 20 (H11). Taxatie Rikkoert € 50."
+  "desc": "Vladislav Zapletal, Ancre Lingne Droite, 15 Rubis. 1904, zakhorloge. Nummer 20 (H11). Taxatie Rikkoert EUR 50." 
  },
  {
   "id": "H21",
@@ -121,15 +133,15 @@
  },
  {
   "id": "H22",
-  "desc": "Guillaume quartz, dames polshorloge. Nummer 22. Niet getaxeerd door Rikkoert."
+  "desc": "Garonne quartz, dames polshorloge. Nummer 22. Niet getaxeerd door Rikkoert."
  },
  {
   "id": "H23",
-  "desc": "Omega dames polshorloge, modern, met bijpassende gouden band. Nummer 23 (S9). Taxatie Rikkoert € 900, incl. band. Aankoopprijs 456 gulden (Omega boekje Heumen, 4-6-75). Band: aankoopprijs 1750 gulden (bon Heumen, 12-9-98). Notitie band: goudwaarde?"
+  "desc": "Omega dames polshorloge, modern, met bijpassende gouden band. Nummer 23 (S9). Taxatie Rikkoert EUR 900, incl. band. Aankoopprijs 456 gulden (Omega boekje Heumen, 4-6-75). Band: aankoopprijs 1750 gulden (bon Heumen, 12-9-98). Notitie band: goudwaarde?"
  },
  {
   "id": "H24",
-  "desc": "Hebdomas, zakhorloge. Nummer 24 (H3). Taxatie Rikkoert € 50 (chroom). Aankoopprijs 140 gulden (bon JG de Wever, 8-8-85)."
+  "desc": "Hebdomas, zakhorloge. Nummer 24 (H3). Taxatie Rikkoert EUR 50 (chroom). Aankoopprijs 140 gulden (bon JG de Wever, 8-8-85)."
  },
  {
   "id": "H25",
@@ -137,95 +149,103 @@
  },
  {
   "id": "J01",
-  "desc": "Collier, bloedkoraal met gouden slotje. Letter a (S14). Taxatie Rikkoert € 125. Aankoopprijs 485 gulden (bon JG de Wever)."
+  "desc": "Collier, bloedkoraal met gouden slotje. Letter a (S14). Taxatie Rikkoert EUR 125. Aankoopprijs 485 gulden (bon JG de Wever)."
  },
  {
   "id": "J02",
-  "desc": "Collier, witte parel met gouden slotje. Letter b (S10?). Taxatie Rikkoert € 55?"
+  "desc": "Collier, witte parel met gouden slotje. Letter b (S10?). Taxatie Rikkoert EUR 55?"
  },
  {
   "id": "J03",
-  "desc": "Parelketting met slotje. Letter c (S10?). Taxatie Rikkoert € 55?"
+  "desc": "Armband witte parel met gouden slotje. Letter c (S10?). Taxatie Rikkoert EUR 40?"
  },
  {
   "id": "J04",
-  "desc": "Parelketting, lang zonder slotje. Letter d. Niet getaxeerd door Rikkoert."
+  "desc": "Ivoorkleurige ketting van been, lang zonder slotje. Letter d. Niet getaxeerd door Rikkoert."
  },
  {
   "id": "J05",
-  "desc": "Parelkettinkje, armband met slotje. Letter e (S11). Taxatie Rikkoert € 40."
+  "desc": "Ivoorkleurige ketting van been met bloemdetails. Letter e (S11). Niet getaxeerd door Rikkoert."
  },
  {
   "id": "J06",
-  "desc": "Ketting, goud, 14 krt 60 cm. Letter f (S3 of S4?). Taxatie Rikkoert € 450 of € 225? Aankoopprijs 640 gulden (bon Heumen, 3-10-98)."
+  "desc": "Ketting, goud, 48 cm. Taxatie Rikkoert EUR 225." 
  },
  {
   "id": "J07",
-  "desc": "Ketting, goud. Letter g (S2 of S4?). Taxatie Rikkoert € 1.050 of € 225?"
+  "desc": "Ketting, goud. 44 cm, met karabijnsluiting. Taxatie Rikkoert EUR 450." 
  },
  {
   "id": "J08",
-  "desc": "Zilveren (?) ketting met slotje. Letter h (?). Taxatie Rikkoert ?"
+  "desc": "[Zilveren en zilverkleurige kettingen; nrs 3,4,5,6,8 en 9 (met camee)]"
  },
  {
   "id": "J09",
-  "desc": "Slaven armband, goud. Letter i (S5 of S6). Taxatie Rikkoert € 2.100 of € 800."
+  "desc": "Brede slaven armband met reliëf, goud. Taxatie Rikkoert EUR 2.100."
  },
  {
   "id": "J10",
-  "desc": "Slaven armband, goud. Letter j (S5 of S6). Taxatie Rikkoert € 2.100 of € 800."
+  "desc": "Smalle slaven armband, goud. Taxatie Rikkoert 800."
  },
- {
+{
   "id": "J11",
-  "desc": "Armbandje, goud. Letter k (S2?). Taxatie Rikkoert € 1.050?"
- },
- {
-  "id": "J12",
-  "desc": "Armband met kettinktjes, zilver. Letter l (?). Taxatie Rikkoert ?"
- },
- {
-  "id": "J13",
-  "desc": "Hanger camee roze, met zilveren ketting. Letter m (S1?). Taxatie Rikkoert € 600?"
+  "desc": "Armband, goud. Letter k (S2?). Taxatie Rikkoert EUR 1.050"
  },
  {
   "id": "J14",
-  "desc": "Hanger camee, met gouden ketting. Letter n (?). Taxatie Rikkoert ?"
- },
- {
-  "id": "J15",
-  "desc": "Camee, wit zonder ketting. Letter o (?). Taxatie Rikkoert ?"
+  "desc": "Blauwe camee aan gouden ketting. Taxatie Rikkoert EUR 600. " 
  },
  {
   "id": "J16",
-  "desc": "Camee blauw, ring. Letter p (S18?). Taxatie Rikkoert € 125?"
+  "desc": "Camee blauw, ring. Letter p (S18?). Taxatie Rikkoert EUR 125"
  },
  {
   "id": "J17",
-  "desc": "Camee wit, ring. Letter q (?). Taxatie Rikkoert ?"
+  "desc": "Camee wit, ring. Letter q (?). Taxatie Rikkoert EUR 150"
  },
  {
   "id": "J18",
-  "desc": "Ringetje, goud. Letter r (S16). Taxatie Rikkoert € 50."
+  "desc": "Ringetje, opengewerkt, goud. Letter r (S16). Taxatie Rikkoert EUR 50."
  },
  {
   "id": "J19",
-  "desc": "Ring, blauwe edelsteen zilver. Letter s (S15). Taxatie Rikkoert € 150."
+  "desc": "Ring, bruine edelsteen zilver. Letter s (S15). Taxatie Rikkoert EUR 150."
  },
  {
   "id": "J20",
-  "desc": "Ring met bladmotief, zilver. Letter t (?). Taxatie Rikkoert ?"
+  "desc": "Ring met bladmotief, zilver. Nummer 25. Niet getaxeerd door Rikkoert."
  },
  {
   "id": "J21",
-  "desc": "Ring, rookkwarts, goud. Letter u (S17). Taxatie Rikkoert € 300. Notitie: van tante Annie (Mons) vermoedelijk. Aankoopprijs 185 gulden (bon Wijnhoven Eindhoven, 12-11-76)."
+  "desc": "Ring, rookkwarts, goud. Letter u (S17). Taxatie Rikkoert EUR 300. Notitie: van tante Annie (Mons) vermoedelijk. Aankoopprijs 185 gulden (bon Wijnhoven Eindhoven, 12-11-76)." 
  },
- {
-  "id": "J22",
-  "desc": "Assortiment armbanden, broches, hangers, oorknopjes. Letter v (S7, S8, S19, S20, S21, S22). Taxatie Rikkoert € 360 (125 + 75 + 50 + 40 + 20 + 50)."
- },
+  {
+    "id": "J22a",
+    "desc": "Opengewerkte ovalen gouden broche. Letter v (S7). Taxatie Rikkoert EUR 125."
+  },
+  {
+    "id": "J22b",
+    "desc": "Ovale broche met gouden bloemetje. Letter v (S8). Taxatie Rikkoert EUR 75."
+  },
+  {
+    "id": "J22c",
+    "desc": "Armband met 4 ovale grijze stenen. Letter v (S19). Taxatie Rikkoert EUR 50."
+  },
+  {
+    "id": "J22d",
+    "desc": "Armband met rode stenen. Letter v (S20). Taxatie Rikkoert EUR 40."
+  },
+  {
+    "id": "J22e",
+    "desc": "Oorbellen met rode stenen. Letter v (S21). Taxatie Rikkoert EUR 20."
+  },
+  {
+    "id": "J22f",
+    "desc": "Armband met bijbelslot. Letter v (S22). Taxatie Rikkoert EUR 50."
+  },
  {
   "id": "J23",
-  "desc": "2x trouwringen J&W, goud. Rikkoert S12, S13. Taxatie Rikkoert € 375 (€ 275 + € 100)."
+  "desc": "2x trouwringen J&W, goud. Rikkoert S12, S13. Taxatie Rikkoert EUR 375 (EUR 275 + EUR 100)."
  },
  {
   "id": "Z01",
@@ -281,11 +301,11 @@
  },
  {
   "id": "P01",
-  "desc": "Rosenthal porcelijnen vaas (Tütten) klein. Aankoopprijs 99,95 gulden (bon Pasch, 12-12-88)."
+  "desc": "Rosenthal porcelijnen vaas (Tüten) klein. Aankoopprijs 99,95 gulden (bon Pasch, 12-12-88)."
  },
  {
   "id": "P02",
-  "desc": "Rosenthal porcelijnen vaas (Tütten) groot."
+  "desc": "Rosenthal porcelijnen vaas (Tüten) groot."
  },
  {
   "id": "P03",
@@ -343,14 +363,58 @@
   "id": "P16",
   "desc": "Napoleon soldaat."
  },
- {
-  "id": "P17",
-  "desc": "Vazen. Zie foto."
- },
- {
-  "id": "P18",
-  "desc": "Wandborden. Zie foto."
- },
+  {
+    "id": "P17a",
+    "desc": "Vaas zwart met groene accenten"
+  },
+  {
+    "id": "P17b",
+    "desc": "Vaas met blauw/groene vogel"
+  },
+  {
+    "id": "P17c",
+    "desc": "Vaas met blauw/groen/bruine vis"
+  },
+  {
+    "id": "P17d",
+    "desc": "Vaas wit/grijs keramiek? met blauw/grijze tekening"
+  },
+  {
+    "id": "P17e",
+    "desc": "Vaas wit/grijs keramiek? met groene tekening"
+  },
+{
+    "id": "P18a",
+    "desc": "Wandbord staatsmijnen"
+  },
+  {
+    "id": "P18b",
+    "desc": "Wandbord blauw/wit met bloemen"
+  },
+  {
+    "id": "P18c",
+    "desc": "Wandbord wapen W 1923"
+  },
+  {
+    "id": "P18d",
+    "desc": "Wandbord zwart-wit gebouw"
+  },
+  {
+    "id": "P18e",
+    "desc": "Schaal blad-vormig met blauw-wit motief"
+  },
+  {
+    "id": "P18f",
+    "desc": "Schaal wit/beige met bloemen en reliëf rand"
+  },
+  {
+    "id": "P18g",
+    "desc": "Schaal vierkant met afgeronde hoeken met rood/roze bloem"
+  },
+  {
+    "id": "P18h",
+    "desc": "Vaas koperkleurig met handvat?"
+  },
  {
   "id": "P19",
   "desc": "Plantenbakje, brons."
