@@ -452,10 +452,6 @@
   "desc": "Napoleon soldaat."
  },
   {
-    "id": "P17a",
-    "desc": "Vaas zwart met groene accenten"
-  },
-  {
     "id": "P17b",
     "desc": "Vaas met blauw/groene vogel"
   },
@@ -464,12 +460,8 @@
     "desc": "Vaas met blauw/groen/bruine vis"
   },
   {
-    "id": "P17d",
-    "desc": "Vaas wit/grijs keramiek? met blauw/grijze tekening"
-  },
-  {
     "id": "P17e",
-    "desc": "Vaas wit/grijs keramiek? met groene tekening"
+    "desc": "Vaas zwart met groene accenten/tekening"
   },
 {
     "id": "P18a",
